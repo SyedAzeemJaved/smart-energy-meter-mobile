@@ -11,15 +11,30 @@
       "resizeMode": "contain",
       "backgroundColor": "#0F4D38"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.smart.energy.meter"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
+      },
+      "package": "com.smart.energy.meter"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "a41efd0d-97bd-40ec-87ba-3f78f824401f"
       }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/a41efd0d-97bd-40ec-87ba-3f78f824401f"
     }
   }
 }
