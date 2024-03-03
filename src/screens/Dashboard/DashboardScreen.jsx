@@ -18,8 +18,7 @@ import handleTimezone from "../../utils/timezone";
 import { LineChart } from "react-native-chart-kit";
 
 export default function DashboardScreen({}) {
-  const { currentUser, setCurrentUser, ipAddress, setIpAddress } =
-    useContext(AuthContext);
+  const { currentUser, setCurrentUser, host_name } = useContext(AuthContext);
   const { setLoading } = useContext(LoadingContext);
   const [viewWidth, setViewWidth] = useState(0); // Initialize with 0
 
@@ -57,7 +56,6 @@ export default function DashboardScreen({}) {
       isAuthenticated: false,
       hasSeenWelcome: false,
     });
-    setIpAddress(undefined);
   };
 
   const handleHadinaClick = () => {
@@ -115,7 +113,7 @@ export default function DashboardScreen({}) {
       headers.append("accept", "application/json");
       headers.append("Authorization", `Bearer ${currentUser.accessToken}`);
 
-      const resp = await fetch(`${ipAddress}/customers/me`, {
+      const resp = await fetch(`${host_name}/customers/me`, {
         method: "GET",
         headers,
       });
@@ -141,7 +139,7 @@ export default function DashboardScreen({}) {
       headers.append("accept", "application/json");
       headers.append("Authorization", `Bearer ${currentUser.accessToken}`);
 
-      const resp = await fetch(`${ipAddress}/customers/me`, {
+      const resp = await fetch(`${host_name}/customers/me`, {
         method: "GET",
         headers,
       });

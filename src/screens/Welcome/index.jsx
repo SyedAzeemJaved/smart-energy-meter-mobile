@@ -11,8 +11,6 @@ export default function WelcomeStack() {
         name="Welcome"
         options={{
           headerShown: false,
-          statusBarStyle: "dark",
-          statusBarTranslucent: true,
         }}
         component={WelcomeScreen}
       ></Stack.Screen>

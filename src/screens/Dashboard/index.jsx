@@ -11,8 +11,6 @@ export default function DashboardStack() {
         name="Dashboard"
         options={{
           headerShown: false,
-          statusBarStyle: "dark",
-          statusBarTranslucent: true,
         }}
         component={DashboardScreen}
       ></Stack.Screen>

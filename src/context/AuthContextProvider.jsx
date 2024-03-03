@@ -10,12 +10,10 @@ export default function AuthContextProvider({ children }) {
     isAuthenticated: false,
     hasSeenWelcome: false,
   });
-  const [ipAddress, setIpAddress] = useState(undefined);
+  const host_name = "https://smart-energy-meter-api-production.up.railway.app";
 
   return (
-    <AuthContext.Provider
-      value={{ currentUser, setCurrentUser, ipAddress, setIpAddress }}
-    >
+    <AuthContext.Provider value={{ currentUser, setCurrentUser, host_name }}>
       {children}
     </AuthContext.Provider>
   );

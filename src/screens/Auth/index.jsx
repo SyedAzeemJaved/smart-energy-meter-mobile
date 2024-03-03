@@ -11,8 +11,6 @@ export default function AuthStack() {
         name="Login"
         options={{
           headerShown: false,
-          statusBarStyle: "dark",
-          statusBarTranslucent: true,
         }}
         component={LoginScreen}
       ></Stack.Screen>
