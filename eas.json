@@ -13,7 +13,9 @@
       "channel": "preview"
     },
     "production": {
-      "channel": "production"
+      "android": {
+        "buildType": "apk"
+      }
     },
     "expo": {
       "android": {
