@@ -31,6 +31,7 @@ export default function TextBox({
       <TextInput
         placeholder={placeholder}
         className="w-full h-12 bg-white-700 text-secondary rounded-lg border-2 border-secondary pl-4 pr-12"
+        autoCapitalize="none"
         secureTextEntry={secureTextEntry}
         onChangeText={(innerText) => {
           setData((prev) => ({

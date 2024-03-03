@@ -19,9 +19,9 @@ export default function WelcomeScreen({ changeSwiperIndex }) {
       image={image}
       topBarShouldShowBack={true}
       bodyPosition={"bottom"}
-      bodyTitle={"Custom Built Meter"}
+      bodyTitle={"Complete System"}
       bodyBody={
-        "Measure electricity consumed, and get billed transparently via our in-house advanced meter."
+        "Our advanced system ensures distruption free electricity usage monitoring, protected with cyber security measures."
       }
       pillStroke={{
         firstStrokeColor: "#4D5A68",

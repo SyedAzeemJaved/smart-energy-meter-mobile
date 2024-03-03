@@ -26,7 +26,7 @@ export default function LoginScreen({ navigation }) {
   const [data, setData] = useState({
     email: "",
     password: "",
-    ipAddress: "",
+    ipAddress: "https://smart-energy-meter-api-production.up.railway.app",
   });
 
   const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
@@ -73,7 +73,7 @@ export default function LoginScreen({ navigation }) {
       });
 
       const response = await resp.json();
-      if (resp.status !== 200) throw new Error(response?.detail);
+      if (resp.status !== 200) Error(response?.detail);
 
       setCurrentUser({
         accessToken: response.access_token,
@@ -114,14 +114,14 @@ export default function LoginScreen({ navigation }) {
             objName={"password"}
             setData={setData}
           />
-          <Text className={textClasses}>API IP</Text>
+          {/* <Text className={textClasses}>API IP</Text>
           <TextBox
             placeholder={"Enter your ip here"}
             iconName={"http"}
             secureTextEntry={false}
             objName={"ipAddress"}
             setData={setData}
-          />
+          /> */}
         </ScrollView>
         {!isKeyboardOpen && (
           <View className="absolute bottom-10 w-full">

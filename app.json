@@ -11,9 +11,7 @@
       "resizeMode": "contain",
       "backgroundColor": "#0F4D38"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.smart.energy.meter"

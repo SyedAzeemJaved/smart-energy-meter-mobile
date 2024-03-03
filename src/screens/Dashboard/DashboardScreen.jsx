@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useRef, useEffect, useContext } from "react";
 import {
   View,
   ScrollView,
@@ -11,6 +11,8 @@ import AuthContext from "../../context/AuthContext";
 import LoadingContext from "../../context/LoadingContext";
 
 import AndroidSafeView from "../../components/AndroidSafeView";
+import customRoundoff from "../../utils/number";
+import handleTimezone from "../../utils/timezone";
 
 // https://www.npmjs.com/package/react-native-chart-kit
 import { LineChart } from "react-native-chart-kit";
@@ -22,12 +24,15 @@ export default function DashboardScreen({}) {
   const [viewWidth, setViewWidth] = useState(0); // Initialize with 0
 
   const [data, setData] = useState({
-    wattsConsumed: 0.0,
+    unitsConsumed: 0.0,
     accountBalanceInRupees: 0.0,
     shouldGetService: false,
     previousVoltageReading: 0.0,
     previousCurrentReading: 0.0,
   });
+
+  const previousUpdatedAt = useRef(null);
+  const apiData = useRef([null, null, null, null, null]);
 
   const onLayout = (event) => {
     const { width } = event.nativeEvent.layout;
@@ -57,6 +62,49 @@ export default function DashboardScreen({}) {
 
   const handleHadinaClick = () => {
     ToastAndroid.show("Developed by Hadina", 200);
+  };
+
+  const pushToLeftAndOverwrite = (newValue, arr) => {
+    // Remove the first element and push the new value to the end
+    arr.splice(0, 1);
+    arr.push(newValue);
+  };
+
+  const handlePushToArray = (response) => {
+    if (response.customer.updated_at !== previousUpdatedAt.current) {
+      pushToLeftAndOverwrite(
+        {
+          val:
+            response.customer.previous_voltage_reading *
+            response.customer.previous_current_reading,
+          time: response.customer.updated_at,
+        },
+        apiData.current
+      );
+    }
+    previousUpdatedAt.current = response.customer.updated_at;
+  };
+
+  const getValues = (propertyName) => {
+    let resultsArr = [];
+    apiData.current.map((item) => {
+      let v =
+        item && item.hasOwnProperty(propertyName)
+          ? typeof item[propertyName] === "number"
+            ? customRoundoff(item[propertyName])
+            : handleTimezone(item[propertyName])
+          : 0;
+      resultsArr.push(v);
+    });
+    return resultsArr;
+  };
+
+  const checkRemainingBalance = (currentBalance) => {
+    if (typeof currentBalance === "number") {
+      if (currentBalance <= 15000) {
+        ToastAndroid.show("Low credit, please recharge", 100);
+      }
+    }
   };
 
   async function fetchCustomer() {
@@ -100,9 +148,12 @@ export default function DashboardScreen({}) {
       const response = await resp.json();
       if (resp.status !== 200) throw new Error(response?.detail);
 
+      handlePushToArray(response);
+      checkRemainingBalance(response.customer.account_balance_in_rupees);
+
       setData((prev) => ({
         ...prev,
-        wattsConsumed: response.customer.watts_consumed,
+        unitsConsumed: response.customer.units_consumed,
         accountBalanceInRupees: response.customer.account_balance_in_rupees,
         shouldGetService: response.customer.should_get_service,
         previousVoltageReading: response.customer.previous_voltage_reading,
@@ -118,8 +169,8 @@ export default function DashboardScreen({}) {
       fetchCustomer();
     }
 
-    // Set up a timer to call fetchData every 7 seconds (7000 milliseconds)
-    const timerId = setInterval(fetchData, 10000);
+    // Set up a timer to call fetchData every 5 seconds (5000 milliseconds)
+    const timerId = setInterval(fetchData, 5000);
 
     // Clean up the timer when the component unmounts
     return () => clearInterval(timerId);
@@ -150,11 +201,11 @@ export default function DashboardScreen({}) {
                   Total Consumed
                 </Text>
                 <View className="flex flex-row">
-                  <Text className="font-poppins font-bold text-5xl mr-2">
-                    {data.wattsConsumed}
+                  <Text className="font-poppins font-bold text-5xl mr-2 py-2">
+                    {customRoundoff(data.unitsConsumed)}
                   </Text>
-                  <Text className="font-poppins font-light text-base uppercase bg-">
-                    Watts
+                  <Text className="font-poppins font-light text-base uppercase">
+                    Units
                   </Text>
                 </View>
               </View>
@@ -163,41 +214,29 @@ export default function DashboardScreen({}) {
                 <Box
                   color="bg-[#98C9B9]"
                   heading="Voltage"
-                  text={`${data.previousVoltageReading}v`}
+                  text={`${customRoundoff(data.previousVoltageReading)}v`}
                 />
                 <Box
                   color="bg-[#B8DBCF]"
                   heading="Current"
-                  text={`${data.previousCurrentReading}mA`}
+                  text={`${customRoundoff(data.previousCurrentReading)}A`}
                 />
                 <Box
                   color="bg-[#DAEDE7]"
                   heading="Power"
-                  text={`${
+                  text={`${customRoundoff(
                     data.previousVoltageReading * data.previousCurrentReading
-                  }w`}
+                  )}w`}
                 />
               </View>
               {/* Chart */}
               <View onLayout={onLayout} className="mt-8 -mb-5">
                 <LineChart
                   data={{
-                    labels: [
-                      "Value 1",
-                      "Value 2",
-                      "Value 3",
-                      "Value 4",
-                      "Value 5",
-                    ],
+                    labels: getValues("time"),
                     datasets: [
                       {
-                        data: [
-                          Math.random() * 100,
-                          Math.random() * 100,
-                          Math.random() * 100,
-                          Math.random() * 100,
-                          Math.random() * 100,
-                        ],
+                        data: getValues("val"),
                       },
                     ],
                   }}
@@ -205,11 +244,11 @@ export default function DashboardScreen({}) {
                   height={200}
                   yAxisSuffix=" w"
                   yAxisInterval={1} // optional, defaults to 1
-                  withShadow={true}
+                  withShadow={false}
                   withInnerLines={true}
                   withOuterLines={false}
                   withHorizontalLabels={true}
-                  withVerticalLabels={false}
+                  withVerticalLabels={true}
                   chartConfig={{
                     backgroundGradientFrom: "#ffffff",
                     backgroundGradientTo: "#ffffff",
@@ -226,7 +265,7 @@ export default function DashboardScreen({}) {
               </View>
             </View>
             {/* Bottom Buttons */}
-            <View className="w-full pb-4">
+            <View className="w-full pt-4">
               <TouchableOpacity
                 className={`h-20 flex items-center justify-center ${
                   data.shouldGetService ? "bg-green-100" : "bg-red-100"
@@ -241,7 +280,7 @@ export default function DashboardScreen({}) {
                 onPress={handleHadinaClick}
               >
                 <Text className="font-quantico text-xl text-center uppercase">
-                  Balance: {data.accountBalanceInRupees.toFixed(2)}
+                  Balance: PKR {customRoundoff(data.accountBalanceInRupees)}
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
